@@ -4,6 +4,25 @@
 WiFiClient espClient;
 PubSubClient mqtt(espClient);
 
+
+void setupMqtt()
+{
+    String clientId = WiFi.hostname();
+
+    mqtt.setServer("broker.lan", 1883);
+    mqtt.setCallback(configCallback);
+    mqtt.connect(clientId.c_str());
+    mqtt.subscribe((char*)("config/"+clientId).c_str(), 1);
+}
+
+void loopMqtt() {
+    mqtt.loop();
+}
+
+void destroyMqtt() {
+    mqtt.disconnect();
+}
+
 void sendMessage()
 {
     if (mqtt.connected()) {
@@ -22,40 +41,6 @@ void sendMessage()
     }
 }
 
-void initMqtt()
-{
-    setupWifi();
-}
-
-void setupWifi()
-{
-    //Serial.begin(460800);
-    //Serial.setDebugOutput(true);
-    //system_phy_set_powerup_option(3);
-    #ifdef CONFIGURE_WIFI
-        WiFi.persistent(true);
-        WiFi.mode(WIFI_STA);
-        WiFi.begin(WIFI_SSID, WIFI_PASS);
-    #endif
-
-    randomSeed(micros());
-}
-
-void setupMqtt()
-{
-    String clientId = WiFi.hostname();
-
-    mqtt.setServer("broker.lan", 1883);
-    mqtt.setCallback(configCallback);
-    mqtt.connect(clientId.c_str());
-    mqtt.subscribe((char*)("config/"+clientId).c_str(), 1);
-    Serial.println("mqtt setup done");
-}
-
-void destroyMqtt() {
-    mqtt.disconnect();
-}
-
 void configCallback(char* topic, byte* payload, unsigned int length) {
     StaticJsonDocument<200> doc;
     DeserializationError error = deserializeJson(doc, payload);
@@ -72,26 +57,3 @@ void configCallback(char* topic, byte* payload, unsigned int length) {
     state.configured = 1;
 }
 
-void updateWifiStatus()
-{
-    switch (WiFi.status()) {
-        case WL_CONNECTED:
-            state.wifi = 2;
-            if (mqtt.connected()) {
-                state.wifi=3;
-                mqtt.loop();
-            } else {
-                Serial.println("Connecting to MQTT broker");
-                setupMqtt();
-            }
-            break;
-        case WL_IDLE_STATUS:
-            state.wifi = 1;
-            break;
-        case WL_CONNECT_FAILED:
-            state.wifi = 4;
-            break;
-        default:
-            state.wifi = 0;
-    }
-}

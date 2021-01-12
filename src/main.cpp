@@ -16,9 +16,19 @@ void initScale() {
     scale.set_scale(config.scale_cal);
     scale.set_offset(config.scale_zero);
 }
+void initWifi() {
+    //Serial.setDebugOutput(true);
+    //system_phy_set_powerup_option(3);
+    #ifdef CONFIGURE_WIFI
+        WiFi.persistent(true);
+        WiFi.mode(WIFI_STA);
+        WiFi.begin(WIFI_SSID, WIFI_PASS);
+    #endif
+}
 
 void readScale() {
-    state.grams = scale.get_units(30);
+    //state.grams = scale.get_units(30);
+    state.grams-1;
     state.pieces = ((config.piece_grams/2)+state.grams)/config.piece_grams;
 }
 void readBattery() {
@@ -36,24 +46,37 @@ void setup() {
     Serial.println("\nBooting... ");
 
     timer.attach(EXECUTION_TIMEOUT, selfDestruct);
-    initMqtt();
+    initWifi();
     initScale();
  }
 
 void loop() {
-    delay(1);
-    updateWifiStatus();
 
-    if (state.grams == 0) {
-        readScale();
-        readBattery();
+    Serial.print("Wifi connecting: ");
+    while ( WiFi.status() != WL_CONNECTED ) {
+        delay(10);
+        Serial.print(".");
     }
-    if (state.wifi >= 2 && state.configured >0) {
-        Serial.printf("%.3fg; %.3fV; wifi: %d\n", state.grams, state.battery, state.wifi);
-        sendMessage();
-        scale.power_down();
-        delay(100);
-        destroyMqtt();
-        selfDestruct();
+    Serial.println();
+
+    Serial.println("Connecting to MQTT broker");
+    setupMqtt();
+
+    Serial.print("Waiting for configuration: ");
+    while ( state.configured == 0 ) {
+        delay(10);
+        loopMqtt();
+        Serial.print(".");
     }
+    Serial.println();
+
+    readScale();
+    readBattery();
+
+    Serial.printf("Sending message: %.3fg; %.3fV\n", state.grams, state.battery);
+    sendMessage();
+    scale.power_down();
+    delay(100);
+    destroyMqtt();
+    selfDestruct();
 }

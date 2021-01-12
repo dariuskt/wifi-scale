@@ -19,7 +19,6 @@ struct globalState {
     float grams = 0;
     float battery = 0;
     int pieces = 0;
-    int wifi = 0;
     int configured = 0;
 };
 

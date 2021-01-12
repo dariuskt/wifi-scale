@@ -6,13 +6,11 @@
 #include <PubSubClient.h>
 #include "global.h"
 
-void sendMessage();
 
-void initMqtt();
-void setupWifi();
 void setupMqtt();
+void loopMqtt();
 void destroyMqtt();
-void updateWifiStatus();
+void sendMessage();
 void configCallback(char* topic, byte* payload, unsigned int length);
 
 #endif // MQTT_H

@@ -47,7 +47,6 @@ void loop() {
     if (state.grams == 0) {
         readScale();
         readBattery();
-        Serial.println("this will never happen");
     }
     if (state.wifi >= 2 && state.configured >0) {
         Serial.printf("%.3fg; %.3fV; wifi: %d\n", state.grams, state.battery, state.wifi);

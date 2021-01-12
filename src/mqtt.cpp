@@ -1,9 +1,6 @@
 #include "mqtt.h"
 #include "ArduinoJson.h"
 
-const char* ssid = "";
-const char* password = "";
-
 WiFiClient espClient;
 PubSubClient mqtt(espClient);
 
@@ -35,9 +32,11 @@ void setupWifi()
     //Serial.begin(460800);
     //Serial.setDebugOutput(true);
     //system_phy_set_powerup_option(3);
-    //WiFi.persistent(false);
-    //WiFi.mode(WIFI_STA);
-    //WiFi.begin(ssid, password);
+    #ifdef CONFIGURE_WIFI
+        WiFi.persistent(true);
+        WiFi.mode(WIFI_STA);
+        WiFi.begin(WIFI_SSID, WIFI_PASS);
+    #endif
 
     randomSeed(micros());
 }

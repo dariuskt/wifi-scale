@@ -1,6 +1,10 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+//#define CONFIGURE_WIFI true
+#define WIFI_SSID "name"
+#define WIFI_PASS "pass"
+
 struct globalConfig {
     int battery_range = 4860;
     float piece_grams = 85.0;

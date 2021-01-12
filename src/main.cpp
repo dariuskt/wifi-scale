@@ -54,6 +54,7 @@ void loop() {
         sendMessage();
         scale.power_down();
         delay(100);
+        destroyMqtt();
         selfDestruct();
     }
 }

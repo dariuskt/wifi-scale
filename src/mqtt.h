@@ -11,6 +11,7 @@ void sendMessage();
 void initMqtt();
 void setupWifi();
 void setupMqtt();
+void destroyMqtt();
 void updateWifiStatus();
 void configCallback(char* topic, byte* payload, unsigned int length);
 

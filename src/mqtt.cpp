@@ -53,6 +53,10 @@ void setupMqtt()
     Serial.println("mqtt setup done");
 }
 
+void destroyMqtt() {
+    mqtt.disconnect();
+}
+
 void configCallback(char* topic, byte* payload, unsigned int length) {
     StaticJsonDocument<200> doc;
     DeserializationError error = deserializeJson(doc, payload);

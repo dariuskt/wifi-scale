@@ -5,7 +5,7 @@
 #define WIFI_SSID "name"
 #define WIFI_PASS "pass"
 
-#define EXECUTION_TIMEOUT 3
+#define EXECUTION_TIMEOUT 10
 
 struct globalConfig {
     int battery_range = 4860;

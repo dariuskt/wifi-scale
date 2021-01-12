@@ -75,7 +75,16 @@ void loop() {
     Serial.printf("Sending message: %.3fg; %.3fV\n", state.grams, state.battery);
     sendMessage();
     scale.power_down();
-    delay(100);
+
+    Serial.print("Shutting down: ");
+    for (int i=0; i<10; i++) {
+        loopMqtt();
+        delay(10);
+        Serial.print(".");
+    }
+    Serial.println();
+
     destroyMqtt();
+    delay(10);
     selfDestruct();
 }

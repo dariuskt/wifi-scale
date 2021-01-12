@@ -1,10 +1,13 @@
 #include <Arduino.h>
+#include "Ticker.h"
 #include "HX711.h"
 #include "mqtt.h"
 
 #define DOUT  D4
 #define CLK  D3
 HX711 scale;
+
+Ticker timer;
 
 void initScale() {
     scale.begin(DOUT, CLK);
@@ -22,13 +25,17 @@ void readBattery() {
     //  (bat)----[180k]----[220k]--(A0)--[100k]----(GND)
     state.battery = map(analogRead(A0), 0, 1024, 0, config.battery_range)/1000.0;
 }
-
+void selfDestruct() {
+    Serial.print("Go back to sleep.");
+    ESP.deepSleep(0);
+}
 // ===============================================
 
 void setup() {
     Serial.begin(76800);
     Serial.println("\nBooting... ");
 
+    timer.attach(5, selfDestruct);
     initMqtt();
     initScale();
  }
@@ -40,13 +47,13 @@ void loop() {
     if (state.grams == 0) {
         readScale();
         readBattery();
+        Serial.println("this will never happen");
     }
     if (state.wifi >= 2 && state.configured >0) {
         Serial.printf("%.3fg; %.3fV; wifi: %d\n", state.grams, state.battery, state.wifi);
         sendMessage();
         scale.power_down();
         delay(100);
-        Serial.print("Go back to sleep.");
-        ESP.deepSleep(0);
+        selfDestruct();
     }
 }

@@ -35,7 +35,7 @@ void setup() {
     Serial.begin(76800);
     Serial.println("\nBooting... ");
 
-    timer.attach(5, selfDestruct);
+    timer.attach(EXECUTION_TIMEOUT, selfDestruct);
     initMqtt();
     initScale();
  }

@@ -1,0 +1,28 @@
+version: '2.4'
+services:
+  dev:
+    image: dariuskt/esp-platformio
+    ports:
+      - '10.24.1.209:22:22'
+    volumes:
+      - '.:/home/project/src'
+      - '/home/project/.ssh:/home/project/.ssh'
+      - '/home/project/.Xauthority:/home/project/.Xauthority'
+      - '/etc/ssh:/etc/ssh'
+      - '/etc/gitconfig:/etc/gitconfig'
+      - '/etc/environment:/etc/environment-vm:ro'
+      - '/tmp/.X11-unix:/tmp/.X11-unix'
+    devices:
+      - '/dev/null:/dev/ttyUSB0'
+    environment:
+      NFQ_PROJECT_ROOT: /home/project/src
+      DISPLAY: $DISPLAY
+
+
+volumes: {  }
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 10.24.1.209/28
+

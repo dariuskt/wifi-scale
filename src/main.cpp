@@ -6,6 +6,7 @@
 #define DOUT  D4
 #define CLK  D3
 HX711 scale;
+#define DONE  D6
 
 Ticker timer;
 
@@ -35,8 +36,12 @@ void readBattery() {
     state.battery = map(analogRead(A0), 0, 1024, 0, config.battery_range)/1000.0;
 }
 void selfDestruct() {
-    Serial.print("Go back to sleep.");
-    ESP.deepSleep(0);
+    Serial.println("Killing power...");
+    pinMode(DONE, OUTPUT);
+    digitalWrite(DONE, HIGH);
+    delay(100);
+    Serial.println("Going back to sleep.");
+    ESP.deepSleep(60e6);
 }
 // ===============================================
 
@@ -45,6 +50,9 @@ void setup() {
     Serial.println("\nBooting... ");
 
     timer.attach(EXECUTION_TIMEOUT, selfDestruct);
+    pinMode(D6, OUTPUT);
+    digitalWrite(D6, LOW);
+
     initWifi();
     initScale();
  }
